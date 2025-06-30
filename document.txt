@@ -1,0 +1,125 @@
+Legal Document Analyzer Application
+
+Overview
+
+The Legal Document Analyzer is a Streamlit-based application designed to process and analyze legal documents.
+It extracts meaningful insights, segments the document into logical clauses, and provides summaries, 
+classifications, and key points for each clause. The application is particularly useful for legal professionals,
+researchers, and anyone working with legal texts.
+
+Key Features
+Document Preprocessing:
+
+Cleans and normalizes the text by removing excessive whitespace, citations, and text in parentheses.
+Ensures the document is ready for further analysis.
+Text Extraction from PDFs:
+
+Extracts text content from uploaded PDF files.
+Handles multi-page documents and preprocesses the extracted text.
+Clause Segmentation:
+
+Splits the document into logical clauses or sections based on common legal patterns (e.g., "SECTION", "Article", numbered clauses, etc.).
+Provides a fallback mechanism to split by paragraphs if no patterns are detected.
+Clause Classification:
+
+Uses a pre-trained Legal BERT model to classify clauses into common legal categories such as:
+Definitions
+Obligations
+Rights
+Termination
+Confidentiality
+Payment Terms
+Governing Law
+Liability
+Data Protection
+Miscellaneous
+Summarization:
+
+Generates concise summaries of each clause using a pre-trained summarization model (facebook/bart-large-cnn).
+Handles long clauses by truncating text appropriately for summarization.
+Extraction of Important Points:
+
+Identifies key sentences in each clause based on linguistic features such as:
+Modal verbs (e.g., "shall", "must").
+Legal phrases (e.g., "hereby", "notwithstanding").
+Defined terms (e.g., capitalized terms).
+Obligation Extraction:
+
+Detects obligations for parties mentioned in the document.
+Uses SpaCy's NLP capabilities to identify subjects (e.g., organizations) and their associated obligations.
+Date Extraction:
+
+Extracts important dates and deadlines from the document using named entity recognition (NER).
+Streamlit User Interface:
+
+Allows users to upload legal documents (PDF or text files).
+Displays an overview of the document, including its length and the number of clauses.
+Provides an expandable breakdown of each clause with:
+Title
+Classification
+Summary
+Important points
+Obligations
+Extracted dates
+Full text (optional)
+
+
+How It Solves Problems
+Time-Saving:
+
+Automates the tedious process of reading and analyzing lengthy legal documents.
+Quickly identifies key clauses, obligations, and dates.
+Improved Accuracy:
+
+Uses pre-trained NLP models to ensure accurate classification and extraction of information.
+Reduces the risk of missing critical details in legal texts.
+Enhanced Productivity:
+
+Provides structured insights, enabling legal professionals to focus on decision-making rather than manual analysis.
+Summarizes clauses for quick understanding.
+Accessibility:
+
+Easy-to-use interface that requires no technical expertise.
+Supports both PDF and text file formats.
+Scalability:
+
+Can handle large documents with multiple clauses and sections.
+Suitable for analyzing contracts, agreements, and other legal documents.
+
+
+Use Cases
+Legal Professionals:
+
+Analyze contracts, agreements, and other legal documents efficiently.
+Extract obligations and deadlines for compliance purposes.
+Researchers:
+
+Study legal texts and identify patterns or trends in clauses.
+Businesses:
+
+Review contracts to ensure compliance with obligations and deadlines.
+Summarize key points for internal stakeholders.
+Students:
+
+Learn about legal document structures and classifications.
+
+
+Technologies Used
+Python Libraries:
+
+Streamlit: For building the user interface.
+transformers: For NLP models (Legal BERT, summarization, NER).
+spacy: For linguistic analysis and named entity recognition.
+PyPDF2: For extracting text from PDF files.
+re: For regular expressions to segment clauses.
+Pre-trained Models:
+
+nlpaueb/legal-bert-base-uncased: For clause classification.
+facebook/bart-large-cnn: For summarization.
+dslim/bert-base-NER: For named entity recognition.
+
+
+Conclusion
+The Legal Document Analyzer simplifies the process of understanding and analyzing legal documents. 
+By leveraging advanced NLP techniques, it provides structured insights, saving time and improving 
+accuracy for legal professionals and other users.
