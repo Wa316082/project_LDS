@@ -9,8 +9,11 @@ from nlp_utils import (
     summarize_clause, extract_dates
 )
 from pdf_utils import extract_text_from_pdf
-from auth import login, register, logout
+from auth import login, register, logout, load_session
 from save_analysis import save_analysis, get_saved_analyses
+
+# ---------------- Load user session on reload ---------------- #
+load_session()
 
 def analyze_document(text: str, models) -> Dict[str, Any]:
     nlp, classifier_tokenizer, classifier_model, summarizer, ner_pipeline = models
@@ -24,7 +27,6 @@ def analyze_document(text: str, models) -> Dict[str, Any]:
     }
     clauses = segment_clauses(text)
     for title, clause_text in clauses:
-
         if not clause_text.strip() or len(clause_text.split()) < 5:
             continue
         try:
@@ -47,7 +49,6 @@ def analyze_document(text: str, models) -> Dict[str, Any]:
             print(f"Error processing clause {title}: {e}")
             continue
     return doc_info
-
 
 # ---------------- Streamlit UI ---------------- #
 def main_app():
@@ -133,8 +134,14 @@ def sidebar_auth():
         else:
             if st.session_state["auth_mode"] == "login":
                 login()
+                if st.button("Go to Register"):
+                    st.session_state["auth_mode"] = "register"
+                    st.rerun()
             elif st.session_state["auth_mode"] == "register":
                 register()
+                if st.button("Go to Login"):
+                    st.session_state["auth_mode"] = "login"
+                    st.rerun()
 
     elif page == "See Saved Files":
         user_email = st.session_state["user"].get("email", "Unknown")
@@ -180,8 +187,6 @@ def sidebar_auth():
                         if st.checkbox(f"Show full text for {clause.get('title', 'Clause')}",
                                        key=f"saved_{idx}_{clause.get('title', str(idx))}"):
                             st.text(clause.get("full_text", ""))
-        else:
-            st.info("No saved analyses found.")
 
     if st.session_state.get("user"):
         if st.sidebar.button("Logout", key="logout_btn"):
