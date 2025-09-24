@@ -12,11 +12,9 @@ def login():
     if st.button("Login", key="sidebar_login_btn"):
         try:
             user = auth.sign_in_with_email_and_password(email, password)
-
+            
             # Save user in session state
             st.session_state["user"] = user
-            st.session_state["idToken"] = user["idToken"]
-            st.session_state["refreshToken"] = user["refreshToken"]
             st.success("Logged in successfully!")
             st.rerun()
         except Exception as e:
