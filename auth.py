@@ -1,9 +1,10 @@
-# auth.py
 import streamlit as st
 from firebase_setup import auth, db
-from cookie_manager import save_user_to_cookies, clear_user_cookies
+import json, os
 
-# Initialize session state for authentication
+TOKEN_FILE = "session.json"
+
+# ---------------- Authentication ---------------- #
 def login():
     st.subheader("Login")
     email = st.text_input("Email")
@@ -11,14 +12,12 @@ def login():
     if st.button("Login", key="sidebar_login_btn"):
         try:
             user = auth.sign_in_with_email_and_password(email, password)
+
+            # Save user in session state
             st.session_state["user"] = user
-            
-            # Save user data to cookies for persistence
-            if save_user_to_cookies(user):
-                st.success("Logged in successfully! (Session will persist)")
-            else:
-                st.success("Logged in successfully!")
-            
+            st.session_state["idToken"] = user["idToken"]
+            st.session_state["refreshToken"] = user["refreshToken"]
+            st.success("Logged in successfully!")
             st.rerun()
         except Exception as e:
             st.error("Login failed. Check your credentials.")
@@ -27,7 +26,7 @@ def login():
         st.session_state["auth_mode"] = "register"
         st.rerun()
 
-# Register a new user
+
 def register():
     st.subheader("Register")
     email = st.text_input("Email", key="reg_email")
@@ -45,16 +44,15 @@ def register():
         st.session_state["auth_mode"] = "login"
         st.rerun()
 
+
 def logout():
-    """Handle user logout and clear cookies"""
-    # Clear session state
+    """Handle user logout"""
     st.session_state["user"] = None
-    
-    # Clear cookies
-    if clear_user_cookies():
-        st.sidebar.info("Logged out successfully!")
-    else:
-        st.sidebar.info("Logged out!")
-    
+
+    # Remove token file when logging out
+    if os.path.exists(TOKEN_FILE):
+        os.remove(TOKEN_FILE)
+
+    st.sidebar.info("Logged out successfully!")
     st.rerun()
 

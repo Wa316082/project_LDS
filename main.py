@@ -11,7 +11,6 @@ from nlp_utils import (
 from pdf_utils import extract_text_from_pdf
 from auth import login, register, logout
 from save_analysis import save_analysis, get_saved_analyses
-from cookie_manager import load_user_from_cookies, is_user_logged_in
 
 def analyze_document(text: str, models) -> Dict[str, Any]:
     nlp, classifier_tokenizer, classifier_model, summarizer, ner_pipeline = models
@@ -26,7 +25,6 @@ def analyze_document(text: str, models) -> Dict[str, Any]:
     clauses = segment_clauses(text)
     for title, clause_text in clauses:
 
-         # Skip empty or very short clauses
         if not clause_text.strip() or len(clause_text.split()) < 5:
             continue
         try:
@@ -35,7 +33,7 @@ def analyze_document(text: str, models) -> Dict[str, Any]:
             obligations = extract_obligations(clause_text, nlp)
             summary = summarize_clause(clause_text, summarizer)
             dates = extract_dates(clause_text, nlp)
-            
+
             doc_info["clauses"].append({
                 "title": title,
                 "type": classification,
@@ -50,14 +48,13 @@ def analyze_document(text: str, models) -> Dict[str, Any]:
             continue
     return doc_info
 
-# Streamlit UI
+
+# ---------------- Streamlit UI ---------------- #
 def main_app():
     st.title("Legal Document Analyzer")
     st.write("Upload a legal document (PDF or text) to analyze its contents")
-    # Load models
-    models = load_models()
 
-    # File upload
+    models = load_models()
     uploaded_file = st.file_uploader("Choose a file", type=["pdf", "txt"])
 
     if uploaded_file:
@@ -65,11 +62,12 @@ def main_app():
             text = extract_text_from_pdf(uploaded_file)
         else:
             text = uploaded_file.read().decode("utf-8")
+
         with st.spinner("Analyzing document..."):
             analysis = analyze_document(text, models)
+
         st.success("Analysis complete!")
 
-         # Display results
         st.subheader("Document Overview")
         st.write(f"Length: {analysis['metadata']['length']} characters")
         st.write(f"Number of clauses: {len(analysis['clauses'])}")
@@ -95,43 +93,39 @@ def main_app():
                     st.write("**Important Dates**:")
                     for date in clause["dates"]:
                         st.write(f"- {date}")
+
                 if st.checkbox(f"Show full text for {clause['title']}", key=clause["title"]):
                     st.text(clause["full_text"])
+
                 if st.session_state.get("user"):
-                    if st.button("Save Analysis to My Account"):
+                    if st.button("Save Analysis to My Account", key=f"save_{clause['title']}"):
                         save_analysis(st.session_state["user"], analysis)
                         st.success("Analysis saved to your account!")
                 else:
                     st.info("Login to save your analysis.")
 
+
 def sidebar_auth():
-    # Sidebar authentication logic
     st.sidebar.title("Navigation")
 
-    # Initialize auth state and check cookies
     if "user" not in st.session_state:
         st.session_state["user"] = None
     if "auth_mode" not in st.session_state:
         st.session_state["auth_mode"] = "login"
-    
-    # Check if user is logged in via cookies (this will restore session if needed)
-    is_user_logged_in()
 
-    # Build menu options dynamically
+    if st.session_state.get("user"):
+        st.sidebar.success(f"✅ Logged in: {st.session_state['user'].get('email', 'Unknown')}")
+    else:
+        st.sidebar.info("❌ Not logged in")
+
     menu_options = ["Analyze Document"]
     if not st.session_state["user"]:
         menu_options.append("Login/Register")
     else:
         menu_options.append("See Saved Files")
 
-    # Sidebar menu
-    page = st.sidebar.radio(
-        "Go to",
-        menu_options,
-        key="main_menu"
-    )
+    page = st.sidebar.radio("Go to", menu_options, key="main_menu")
 
-    # Show login/register or saved files in sidebar
     if page == "Login/Register":
         if st.session_state["user"]:
             user_email = st.session_state["user"].get("email", "Unknown")
@@ -141,9 +135,9 @@ def sidebar_auth():
                 login()
             elif st.session_state["auth_mode"] == "register":
                 register()
+
     elif page == "See Saved Files":
         user_email = st.session_state["user"].get("email", "Unknown")
-        st.sidebar.success(f"Logged in as: {user_email}")
         saved = get_saved_analyses(st.session_state["user"])
         st.header("Your Saved Analyses")
         if saved:
@@ -156,11 +150,11 @@ def sidebar_auth():
                     formatted_time = 'N/A'
                 st.markdown(f"---\n### {display_name} (Saved at {formatted_time})")
                 analysis = item.get("analysis", {})
-                # Show metadata
+
                 if "metadata" in analysis:
                     st.write(f"**Length:** {analysis['metadata'].get('length', 'N/A')} characters")
                     st.write(f"**Number of clauses:** {len(analysis.get('clauses', []))}")
-                # Show clause breakdown
+
                 st.subheader("Clause Breakdown")
                 for clause in analysis.get("clauses", []):
                     with st.expander(f"{clause.get('title', 'Clause')} - {clause.get('type', 'Unknown')}"):
@@ -183,22 +177,24 @@ def sidebar_auth():
                             for date in clause["dates"]:
                                 st.write(f"- {date}")
 
-                        if st.checkbox(f"Show full text for {clause.get('title', 'Clause')}", key=f"saved_{idx}_{clause.get('title', str(idx))}"):
+                        if st.checkbox(f"Show full text for {clause.get('title', 'Clause')}",
+                                       key=f"saved_{idx}_{clause.get('title', str(idx))}"):
                             st.text(clause.get("full_text", ""))
         else:
             st.info("No saved analyses found.")
-    
-    # Show logout button only if user is logged in
+
     if st.session_state.get("user"):
         if st.sidebar.button("Logout", key="logout_btn"):
-            logout()  # Use the logout function from auth.py
+            logout()
 
     return page
+
 
 def main():
     page = sidebar_auth()
     if page == "Analyze Document":
         main_app()
+
 
 if __name__ == "__main__":
     main()
