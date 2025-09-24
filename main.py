@@ -9,8 +9,9 @@ from nlp_utils import (
     summarize_clause, extract_dates
 )
 from pdf_utils import extract_text_from_pdf
-from auth import login, register  # Or from firebase_auth import login, register
-from save_analysis import save_analysis, get_saved_analyses  # Assuming you have a function to save analysis
+from auth import login, register, logout
+from save_analysis import save_analysis, get_saved_analyses
+from cookie_manager import load_user_from_cookies, is_user_logged_in
 
 def analyze_document(text: str, models) -> Dict[str, Any]:
     nlp, classifier_tokenizer, classifier_model, summarizer, ner_pipeline = models
@@ -107,11 +108,14 @@ def sidebar_auth():
     # Sidebar authentication logic
     st.sidebar.title("Navigation")
 
-    # Auth state
+    # Initialize auth state and check cookies
     if "user" not in st.session_state:
         st.session_state["user"] = None
     if "auth_mode" not in st.session_state:
         st.session_state["auth_mode"] = "login"
+    
+    # Check if user is logged in via cookies (this will restore session if needed)
+    is_user_logged_in()
 
     # Build menu options dynamically
     menu_options = ["Analyze Document"]
@@ -130,18 +134,16 @@ def sidebar_auth():
     # Show login/register or saved files in sidebar
     if page == "Login/Register":
         if st.session_state["user"]:
-            st.sidebar.success("Logged in!")
-            if st.sidebar.button("Logout", key="logout_btn"):
-                st.session_state["user"] = None
-                st.sidebar.info("Logged out.")
-                st.rerun()
+            user_email = st.session_state["user"].get("email", "Unknown")
+            st.sidebar.success(f"Logged in as: {user_email}")
         else:
             if st.session_state["auth_mode"] == "login":
                 login()
             elif st.session_state["auth_mode"] == "register":
                 register()
     elif page == "See Saved Files":
-        st.sidebar.success("Logged in!")
+        user_email = st.session_state["user"].get("email", "Unknown")
+        st.sidebar.success(f"Logged in as: {user_email}")
         saved = get_saved_analyses(st.session_state["user"])
         st.header("Your Saved Analyses")
         if saved:
@@ -185,10 +187,11 @@ def sidebar_auth():
                             st.text(clause.get("full_text", ""))
         else:
             st.info("No saved analyses found.")
-    if st.sidebar.button("Logout", key="logout_btn"):
-        st.session_state["user"] = None
-        st.sidebar.info("Logged out.")
-        st.rerun()
+    
+    # Show logout button only if user is logged in
+    if st.session_state.get("user"):
+        if st.sidebar.button("Logout", key="logout_btn"):
+            logout()  # Use the logout function from auth.py
 
     return page
 
