@@ -1,206 +1,131 @@
-from firebase_setup import db
+from firebase_setup import db, auth
 import time
 import re
-from collections import Counter
+import streamlit as st
 
 def generate_analysis_name(analysis):
     """
-    Generate an intelligent name based on document content analysis
+    Generate a simple name based on document title
     """
-    # Extract basic info
-    clauses = analysis.get("clauses", [])
+    # Get document title from document_info
+    doc_info = analysis.get("document_info", {})
+    title = doc_info.get("title", "")
     
-    # If no clauses, fallback to simple naming
-    if not clauses:
-        timestamp = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
-        return f"Document_Analysis_{timestamp}"
+    if title and title != "Legal Document":
+        # Clean the title for use as filename
+        clean_title = re.sub(r'[^a-zA-Z0-9\s]', '', title)
+        clean_title = re.sub(r'\s+', '_', clean_title.strip())[:50]  # Limit length
+    else:
+        clean_title = "Legal_Document"
     
-    # Analyze clause types to identify document category
-    clause_types = [clause.get("type", "Unknown") for clause in clauses]
-    type_counter = Counter(clause_types)
-    
-    # Determine document type based on clause patterns
-    document_type = identify_document_type(type_counter, clauses)
-    
-    # Extract key entities or parties
-    parties = extract_parties_from_clauses(clauses)
-    
-    # Extract key subject matter
-    subject_matter = extract_subject_matter(clauses)
-    
-    # Build intelligent name
-    name_parts = []
-    
-    # Add document type
-    if document_type and document_type != "Legal_Document":
-        name_parts.append(document_type)
-    
-    # Add subject matter if found
-    if subject_matter:
-        name_parts.append(subject_matter)
-    
-    # Add parties if identified
-    if parties and len(parties) <= 2:
-        party_str = "_".join(parties)
-        name_parts.append(party_str)
-    
-    # If we couldn't determine much, use dominant clause type
-    if not name_parts:
-        dominant_type = type_counter.most_common(1)[0][0] if type_counter else "Document"
-        name_parts.append(dominant_type.replace(" ", "_"))
-    
-    # Add clause count for context
-    name_parts.append(f"{len(clauses)}clauses")
-    
-    # Add timestamp
+    # Add timestamp to avoid duplicates
     timestamp = time.strftime("%Y%m%d_%H%M", time.localtime())
     
-    # Combine parts (limit total length)
-    base_name = "_".join(name_parts)[:50]  # Limit length
-    return f"{base_name}_{timestamp}"
+    return f"{clean_title}_{timestamp}"
 
-def identify_document_type(type_counter, clauses):
-    """
-    Identify document type based on clause patterns and content
-    """
-    # Check clause titles and content for document type indicators
-    all_text = " ".join([
-        clause.get("title", "") + " " + 
-        clause.get("summary", "") + " " + 
-        clause.get("full_text", "")[:200]  # First 200 chars
-        for clause in clauses
-    ]).lower()
-    
-    # Document type patterns
-    patterns = {
-        "Service_Agreement": ["service", "services", "performance", "deliverable"],
-        "Employment_Contract": ["employment", "employee", "employer", "salary", "termination"],
-        "Non_Disclosure_Agreement": ["confidential", "non-disclosure", "nda", "proprietary"],
-        "Purchase_Agreement": ["purchase", "sale", "buyer", "seller", "goods"],
-        "License_Agreement": ["license", "intellectual property", "copyright", "patent"],
-        "Lease_Agreement": ["lease", "rental", "tenant", "landlord", "property"],
-        "Partnership_Agreement": ["partnership", "partner", "joint venture", "collaboration"],
-        "Software_Agreement": ["software", "application", "code", "system", "platform"],
-        "Terms_of_Service": ["terms of service", "user agreement", "platform", "website"],
-        "Privacy_Policy": ["privacy", "data protection", "personal information", "cookies"],
-        "Consulting_Agreement": ["consulting", "consultant", "advisory", "professional services"]
-    }
-    
-    # Score each document type
-    scores = {}
-    for doc_type, keywords in patterns.items():
-        score = sum(all_text.count(keyword) for keyword in keywords)
-        if score > 0:
-            scores[doc_type] = score
-    
-    # Return the highest scoring type
-    if scores:
-        return max(scores.items(), key=lambda x: x[1])[0]
-    
-    # Fallback to clause type analysis
-    dominant_types = type_counter.most_common(3)
-    if dominant_types:
-        dominant = dominant_types[0][0]
-        if "Payment" in dominant:
-            return "Financial_Agreement"
-        elif "Confidentiality" in dominant:
-            return "NDA"
-        elif "Obligations" in dominant:
-            return "Service_Contract"
-        elif "Rights" in dominant:
-            return "Rights_Agreement"
-    
-    return "Legal_Document"
+def refresh_user_token(user):
+    """Refresh the user's ID token if it's expired"""
+    try:
+        # Try to get account info to check if token is valid
+        auth.get_account_info(user.get('idToken'))
+        return user  # Token is still valid
+    except:
+        # Token is expired, need to refresh from session/cookies
+        # This would normally be handled by the auth system
+        # For now, return the user as-is and let the error bubble up
+        return user
 
-def extract_parties_from_clauses(clauses):
-    """
-    Extract party names or organizations from clauses
-    """
-    parties = set()
+def save_analysis(user, analysis, final_report=None):
+    """Save analysis with final report"""
+    print("=== SAVE_ANALYSIS FUNCTION CALLED ===")
+    print(f"User provided: {user is not None}")
+    print(f"Analysis provided: {analysis is not None}")
+    print(f"Final report provided: {final_report is not None}")
     
-    for clause in clauses:
-        # Check obligations section for parties
-        obligations = clause.get("obligations", {})
-        for party in obligations.keys():
-            if party != "All Parties":
-                # Clean and add party name
-                clean_party = re.sub(r'[^a-zA-Z0-9]', '', party)[:15]  # Clean and limit length
-                if len(clean_party) > 2:  # Avoid short artifacts
-                    parties.add(clean_party)
+    try:
+        # Ensure we have a fresh token
+        user = refresh_user_token(user)
         
-        # Extract from clause text using simple patterns
-        text = clause.get("full_text", "") + " " + clause.get("summary", "")
+        # Get user ID with fallback
+        user_id = user.get('localId')
+        if not user_id:
+            # Fallback: use email as identifier (not ideal but functional)
+            user_id = user.get('email', 'unknown_user')
         
-        # Look for company/organization patterns
-        company_patterns = [
-            r'\b([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)*)\s+(?:Inc|LLC|Corp|Ltd|Company)\b',
-            r'\b([A-Z][a-zA-Z]+)\s+(?:Inc|LLC|Corp|Ltd)\b'
-        ]
+        print(f"User ID: {user_id}")
         
-        for pattern in company_patterns:
-            matches = re.findall(pattern, text)
-            for match in matches:
-                clean_match = re.sub(r'[^a-zA-Z0-9]', '', match)[:15]
-                if len(clean_match) > 2:
-                    parties.add(clean_match)
-    
-    return list(parties)[:3]  # Return up to 3 parties
-
-def extract_subject_matter(clauses):
-    """
-    Extract key subject matter or purpose from document
-    """
-    # Combine summaries to find common themes
-    summaries = " ".join([clause.get("summary", "") for clause in clauses]).lower()
-    
-    # Key subject matter patterns
-    subjects = {
-        "Data_Processing": ["data", "processing", "information", "database"],
-        "Software_Dev": ["software", "development", "application", "system"],
-        "Marketing": ["marketing", "advertising", "promotion", "campaign"],
-        "Research": ["research", "study", "analysis", "investigation"],
-        "Consulting": ["consulting", "advisory", "professional", "expertise"],
-        "Training": ["training", "education", "learning", "instruction"],
-        "Maintenance": ["maintenance", "support", "service", "repair"],
-        "Supply": ["supply", "delivery", "goods", "materials"],
-        "Real_Estate": ["property", "real estate", "building", "premises"],
-        "Financial": ["payment", "financial", "money", "compensation"]
-    }
-    
-    scores = {}
-    for subject, keywords in subjects.items():
-        score = sum(summaries.count(keyword) for keyword in keywords)
-        if score > 0:
-            scores[subject] = score
-    
-    if scores:
-        return max(scores.items(), key=lambda x: x[1])[0]
-    
-    return None
-
-def save_analysis(user, analysis):
-    # Get user ID with fallback
-    user_id = user.get('localId')
-    if not user_id:
-        # Fallback: use email as identifier (not ideal but functional)
-        user_id = user.get('email', 'unknown_user')
-    
-    token = user['idToken']
-    name = generate_analysis_name(analysis)
-    db.child("analyses").child(user_id).child(name).set({
-        "name": name,
-        "timestamp": int(time.time()),
-        "analysis": analysis
-    }, token)
+        # Check if token exists
+        token = user.get('idToken')
+        if not token:
+            raise Exception("No authentication token found - please log in again")
+        
+        print("Token validated successfully")
+        
+        name = generate_analysis_name(analysis)
+        print(f"Generated name: {name}")
+        
+        # Handle large reports by truncating if necessary
+        if final_report and len(final_report) > 100000:  # 100KB limit
+            final_report = final_report[:100000] + "\n\n[Report truncated due to size limits]"
+            print("Report truncated due to size")
+        
+        # Prepare minimal data to save
+        save_data = {
+            "name": name,
+            "timestamp": int(time.time()),
+            "document_info": analysis.get("document_info", {}),
+            "summary": {
+                "total_clauses": len(analysis.get("clauses", [])),
+                "total_dates": len(analysis.get("all_dates", [])),
+                "total_parties": len(analysis.get("all_obligations", {})),
+                "document_length": analysis.get("metadata", {}).get("length", 0)
+            },
+            "final_report": final_report or "No report generated"
+        }
+        
+        print(f"Data prepared for saving, size: {len(str(save_data))} characters")
+        
+        # Save to database with error handling
+        try:
+            print("Attempting to save to database...")
+            result = db.child("analyses").child(user_id).child(name).set(save_data, token)
+            print(f"Database save result: {result}")
+            print("=== SAVE SUCCESSFUL ===")
+            return True
+        except Exception as db_error:
+            print(f"Database error occurred: {db_error}")
+            # If it's an auth error, suggest re-login
+            if "auth" in str(db_error).lower() or "unauthorized" in str(db_error).lower() or "permission" in str(db_error).lower():
+                raise Exception("Authentication expired - please log out and log back in")
+            else:
+                raise Exception(f"Database error: {str(db_error)}")
+        
+    except Exception as e:
+        error_msg = f"Error saving analysis: {str(e)}"
+        print(f"=== SAVE ERROR: {error_msg} ===")
+        raise Exception(error_msg)
 
 def get_saved_analyses(user):
-    # Get user ID with fallback
-    user_id = user.get('localId')
-    if not user_id:
-        # Fallback: use email as identifier (not ideal but functional)
-        user_id = user.get('email', 'unknown_user')
-    
-    analyses = db.child("analyses").child(user_id).get()
-    if analyses.each():
-        return [item.val() for item in analyses.each()]
-    return []
+    """Get all saved analyses for a user"""
+    try:
+        # Get user ID with fallback
+        user_id = user.get('localId')
+        if not user_id:
+            # Fallback: use email as identifier (not ideal but functional)
+            user_id = user.get('email', 'unknown_user')
+        
+        # Get token for authenticated request
+        token = user.get('idToken')
+        if not token:
+            return []
+        
+        analyses = db.child("analyses").child(user_id).get(token)
+        
+        if analyses.each():
+            return [item.val() for item in analyses.each()]
+        else:
+            return []
+            
+    except Exception as e:
+        print(f"Error getting saved analyses: {str(e)}")
+        return []
