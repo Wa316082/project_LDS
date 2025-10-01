@@ -197,16 +197,16 @@ def summarize_clause(text: str, summarizer) -> str:
     if not text.strip() or len(text.split()) < 10:
         return text[:200] + "..." if len(text) > 200 else text
     
-    try:
-        # Ensure text isn't too long for the model
-        if len(text.split()) > 1024:  # BART's typical max length
-            text = ' '.join(text.split()[:1000])
-            
-        summary = summarizer(text, max_length=130, min_length=30, do_sample=False)
-        return summary[0]['summary_text']
-    except Exception as e:
-        print(f"Summarization failed: {e}")
-        return text[:200] + "..." if len(text) > 200 else text
+    # Since we don't have transformers anymore, use simple text truncation
+    # Take the first sentence and truncate to reasonable length
+    sentences = text.split('.')
+    if sentences:
+        first_sentence = sentences[0].strip() + '.'
+        if len(first_sentence) > 150:
+            first_sentence = first_sentence[:147] + '...'
+        return first_sentence
+    else:
+        return text[:150] + "..." if len(text) > 150 else text
 
 # Extract dates and deadlines
 def extract_dates(text: str, nlp) -> List[Dict[str, str]]:
