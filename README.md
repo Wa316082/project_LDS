@@ -5,7 +5,7 @@ A Streamlit-based web application that uses AI/ML to analyze legal documents, ex
 ## Features
 
 - 📄 **Document Upload**: Support for PDF and text files
-- 🤖 **AI-Powered Analysis**: Automatic clause classification and summarization
+- 🤖 **Rule-Based Analysis**: Automatic clause classification and simple summarization
 - 🔍 **Information Extraction**: Extract important points, obligations, and dates
 - 👤 **User Authentication**: Firebase-based login/registration system
 - 💾 **Save Analyses**: Store and retrieve your document analyses
@@ -52,23 +52,26 @@ If you don't have a `requirements.txt` file, install the packages manually:
 
 ```bash
 pip install streamlit
-pip install streamlit-cookies-manager
-pip install torch torchvision torchaudio
-pip install transformers
+pip install streamlit-cookies-manager  
 pip install spacy
 pip install pypdf2
 pip install pyrebase4
 pip install python-dateutil
 pip install nltk
-pip install scikit-learn
 pip install pandas
 pip install numpy
+pip install "urllib3<2.0.0"
 ```
 
 ### 4. Install spaCy Language Model
 
 ```bash
 python -m spacy download en_core_web_sm
+```
+
+**Alternative method if the above doesn't work:**
+```bash
+pip install https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
 ```
 
 ### 5. Firebase Setup
