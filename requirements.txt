@@ -5,6 +5,9 @@ streamlit>=1.28.0
 streamlit-cookies-manager>=0.2.0
 pyrebase4>=4.7.1
 
+# Environment variables
+python-dotenv>=1.0.0
+
 # NLP libraries (lightweight)
 spacy>=3.6.0
 
@@ -22,3 +25,9 @@ numpy>=1.24.0
 # Additional utilities
 requests>=2.31.0
 urllib3<2.0.0
+
+# Google Cloud and Firebase dependencies
+gcloud>=0.18.0
+oauth2client>=4.1.0
+pycryptodome>=3.20.0
+python-jwt>=4.0.0

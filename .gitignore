@@ -1,0 +1,33 @@
+# Node.js dependencies
+node_modules/
+
+# Python dependencies
+__pycache__/
+venv/
+*.egg-info/
+*.pyc
+
+# Environment files
+.env
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Build output
+dist/
+build/
+out/
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Misc
+*.bak
+*.tmp
