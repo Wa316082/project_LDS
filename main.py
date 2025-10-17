@@ -1,18 +1,18 @@
 import time
-import streamlit as st
-from typing import Dict, Any
+from typing import Any, Dict
 
+import streamlit as st
+
+from auth import load_session, login, logout, register
 from models import load_models
-from nlp_utils import (
-    preprocess_text, segment_clauses, classify_clause,
-    extract_important_points, extract_obligations,
-    summarize_clause, extract_dates, extract_document_info,
-    format_document_analysis, format_dates_section, 
-    format_obligations_section, create_executive_summary
-)
+from nlp_utils import (classify_clause, create_executive_summary,
+                       extract_dates, extract_document_info,
+                       extract_important_points, extract_obligations,
+                       format_dates_section, format_document_analysis,
+                       format_obligations_section, preprocess_text,
+                       segment_clauses, summarize_clause)
 from pdf_utils import extract_text_from_pdf
-from auth import login, register, logout, load_session
-from save_analysis import save_analysis, get_saved_analyses
+from save_analysis import get_saved_analyses, save_analysis
 
 # ---------------- Load user session on reload ---------------- #
 load_session()
@@ -151,9 +151,6 @@ def main_app():
                         else:
                             st.write(f"- {date}")
 
-                if st.checkbox(f"Show full text for {clause['title']}", key=clause["title"]):
-                    st.text(clause["full_text"])
-
         # Enhanced summary sections
         if "all_obligations" in analysis and analysis["all_obligations"]:
             st.subheader("📋 All Party Obligations Summary")
@@ -175,11 +172,11 @@ def main_app():
         
         if st.button("Generate Comprehensive Report", key="generate_report_btn"):
             try:
-                from nlp_utils import (
-                    format_document_analysis, format_dates_section,
-                    format_obligations_section, create_executive_summary
-                )
-                
+                from nlp_utils import (create_executive_summary,
+                                       format_dates_section,
+                                       format_document_analysis,
+                                       format_obligations_section)
+
                 # Generate comprehensive report
                 if "document_info" in analysis:
                     executive_summary = create_executive_summary(

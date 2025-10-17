@@ -52,7 +52,7 @@ If you don't have a `requirements.txt` file, install the packages manually:
 
 ```bash
 pip install streamlit
-pip install streamlit-cookies-manager  
+pip install streamlit-cookies-manager
 pip install spacy
 pip install pypdf2
 pip install pyrebase4
@@ -70,6 +70,7 @@ python -m spacy download en_core_web_sm
 ```
 
 **Alternative method if the above doesn't work:**
+
 ```bash
 pip install https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
 ```
@@ -163,11 +164,13 @@ project-LDS/
 ## Usage Instructions
 
 ### 1. First Time Setup
+
 1. Start the application using `streamlit run main.py`
 2. Navigate to "Login/Register" in the sidebar
 3. Create a new account or login with existing credentials
 
 ### 2. Analyzing Documents
+
 1. Go to "Analyze Document" page
 2. Upload a PDF or text file containing legal content
 3. Wait for the AI analysis to complete
@@ -178,11 +181,13 @@ project-LDS/
    - Key dates and deadlines
 
 ### 3. Saving Analyses
+
 1. After analyzing a document, click "Save Analysis to My Account"
 2. Access saved analyses from "See Saved Files" in the sidebar
 3. View, review, and manage your previous analyses
 
 ### 4. Session Management
+
 - Your login session will persist across browser restarts
 - Sessions automatically expire after 7 days
 - Use the "Logout" button to manually end your session
@@ -192,6 +197,7 @@ project-LDS/
 ### Common Issues
 
 1. **Import Errors**: Make sure all required packages are installed
+
    ```bash
    pip install -r requirements.txt
    ```
@@ -199,6 +205,7 @@ project-LDS/
 2. **Firebase Authentication Errors**: Check your Firebase configuration in `firebase_setup.py`
 
 3. **Model Loading Issues**: Ensure spaCy model is installed:
+
    ```bash
    python -m spacy download en_core_web_sm
    ```
@@ -240,6 +247,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Support
 
 For issues and questions:
+
 1. Check the troubleshooting section above
 2. Review existing GitHub issues
 3. Create a new issue with detailed information about your problem

@@ -1,7 +1,9 @@
 import re
-from typing import List, Dict
-import PyPDF2
 from collections import defaultdict
+from typing import Dict, List
+
+import PyPDF2
+
 
 # Document preprocessing
 def preprocess_text(text: str) -> str:
@@ -209,6 +211,128 @@ def summarize_clause(text: str, summarizer) -> str:
         return text[:150] + "..." if len(text) > 150 else text
 
 # Extract dates and deadlines
+def create_meaningful_context(date_text: str, sentence: str) -> str:
+    """Create a clear, meaningful context that explains what the date is for (max 2 lines, complete sentences)"""
+    sentence_lower = sentence.lower()
+    
+    # First, try to create a concise but complete context based on content type
+    if 'submit' in sentence_lower or 'file' in sentence_lower:
+        # Remove redundant "within" if date_text already contains it
+        timeframe = date_text
+        if 'within' in date_text.lower():
+            timeframe = date_text
+            prefix = ""
+        else:
+            prefix = "within "
+        
+        if 'report' in sentence_lower:
+            base = f"Reports must be submitted {prefix}{timeframe}."
+        elif 'invoice' in sentence_lower:
+            base = f"Invoice must be submitted {prefix}{timeframe}."
+        elif 'documentation' in sentence_lower:
+            base = f"Documentation must be submitted {prefix}{timeframe}."
+        else:
+            base = f"Documents must be submitted {prefix}{timeframe}."
+        
+        # Add completion details if space allows
+        if 'after completion' in sentence_lower and len(base) < 60:
+            return f"{base} Required after completion of deliverables."
+        elif 'after acceptance' in sentence_lower and len(base) < 60:
+            return f"{base} Required after acceptance of work."
+        return base
+    
+    elif 'notice' in sentence_lower or 'notify' in sentence_lower:
+        if 'terminate' in sentence_lower:
+            return f"Termination requires {date_text} written notice. Either party may terminate with proper notice."
+        elif 'cancel' in sentence_lower:
+            return f"Cancellation requires {date_text} prior written notice. Policy cannot be canceled without notice."
+        else:
+            return f"Written notice period: {date_text}. Required for breach notification."
+    
+    elif 'remedy' in sentence_lower or 'cure' in sentence_lower or 'correct' in sentence_lower:
+        return f"Breach cure period: {date_text}. CONSULTANT must remedy violations within this timeframe."
+    
+    elif 'pay' in sentence_lower or 'payment' in sentence_lower:
+        return f"Payment deadline: {date_text}. All deductibles and retentions must be paid within this period."
+    
+    elif 'coverage' in sentence_lower or 'insurance' in sentence_lower:
+        return f"Insurance coverage period: {date_text}. Required coverage after agreement expiration."
+    
+    elif 'retain' in sentence_lower or 'maintain' in sentence_lower:
+        if 'record' in sentence_lower:
+            return f"Record retention period: {date_text}. Records must be maintained from final payment date."
+        else:
+            return f"Retention period: {date_text}. Documents must be kept for this duration."
+    
+    elif 'inspect' in sentence_lower or 'review' in sentence_lower:
+        return f"Inspection frequency: {date_text}. CONSULTANT shall perform reviews on this basis."
+    
+    elif 'address' in sentence_lower:
+        return f"Address reference: {date_text}"
+    
+    elif 'code' in sentence_lower or 'division' in sentence_lower:
+        return f"Legal code reference: {date_text}"
+    
+    elif 'page' in sentence_lower:
+        return f"Document page reference: {date_text}"
+    
+    else:
+        # Extract meaningful context by finding complete sentence fragments
+        # Split the sentence and find the part containing the date
+        sentence_parts = re.split(r'[.!?]', sentence)
+        
+        # Find the part containing our date
+        date_part = ""
+        for part in sentence_parts:
+            if date_text.lower() in part.lower():
+                date_part = part.strip()
+                break
+        
+        if date_part:
+            # If the part is reasonably short, use it as is
+            if len(date_part) <= 100:
+                return date_part + "."
+            
+            # Otherwise, extract around the date but ensure complete words
+            words = date_part.split()
+            date_words = date_text.split()
+            
+            # Find date position
+            date_word_start = -1
+            for i, word in enumerate(words):
+                if date_words[0].lower() in word.lower():
+                    date_word_start = i
+                    break
+            
+            if date_word_start != -1:
+                # Extract context ensuring we don't cut mid-sentence
+                # Look for sentence beginning markers
+                start_idx = 0
+                for i in range(date_word_start - 1, -1, -1):
+                    if words[i].lower() in ['must', 'shall', 'will', 'the', 'all', 'within', 'after', 'before']:
+                        start_idx = i
+                        break
+                
+                # Find reasonable end point
+                end_idx = min(len(words), date_word_start + len(date_words) + 8)
+                
+                # Extract and ensure it's not too long
+                context = ' '.join(words[start_idx:end_idx])
+                if len(context) <= 100:
+                    return context + "."
+                
+                # If still too long, use minimal context around date
+                start_idx = max(0, date_word_start - 3)
+                end_idx = min(len(words), date_word_start + len(date_words) + 3)
+                return ' '.join(words[start_idx:end_idx]) + "."
+        
+        # Final fallback: use the original sentence but ensure it's complete
+        if len(sentence) <= 120:
+            return sentence if sentence.endswith('.') else sentence + "."
+        
+        # If sentence is too long, extract a meaningful portion
+        return sentence[:100].rsplit(' ', 1)[0] + "..."
+
 def extract_dates(text: str, nlp) -> List[Dict[str, str]]:
     """Extract important dates with context from text"""
     if not nlp:
@@ -224,44 +348,24 @@ def extract_dates(text: str, nlp) -> List[Dict[str, str]]:
             sent = ent.sent
             sentence_text = sent.text.strip()
             
-            # Extract better context by finding complete words around the date
+            # Extract better context by including neighboring sentences for complete context
             date_text = ent.text
             
-            # Find the position of the date in the sentence
-            date_pos = sentence_text.lower().find(date_text.lower())
+            # Get the current sentence and try to get neighboring sentences for fuller context
+            sentences = list(doc.sents)
+            current_sent_idx = -1
             
-            if date_pos != -1:
-                # Extract context with complete words (±5 words around the date)
-                words = sentence_text.split()
-                date_words = date_text.split()
-                
-                # Find the date position in word array
-                date_word_start = -1
-                for i, word in enumerate(words):
-                    if date_words[0].lower() in word.lower():
-                        # Check if this is the right match
-                        match_found = True
-                        for j, date_word in enumerate(date_words):
-                            if i + j >= len(words) or date_word.lower() not in words[i + j].lower():
-                                match_found = False
-                                break
-                        if match_found:
-                            date_word_start = i
-                            break
-                
-                if date_word_start != -1:
-                    # Extract 5 words before and after
-                    context_start = max(0, date_word_start - 5)
-                    context_end = min(len(words), date_word_start + len(date_words) + 5)
-                    context_words = words[context_start:context_end]
-                    context = ' '.join(context_words)
-                else:
-                    # Fallback to sentence fragment
-                    context_start = max(0, date_pos - 30)
-                    context_end = min(len(sentence_text), date_pos + len(date_text) + 30)
-                    context = sentence_text[context_start:context_end].strip()
+            # Find the index of the current sentence
+            for i, s in enumerate(sentences):
+                if s.start <= ent.start < s.end:
+                    current_sent_idx = i
+                    break
+            
+            if current_sent_idx != -1:
+                # Create meaningful context that explains what the date is for
+                context = create_meaningful_context(date_text, sentence_text)
             else:
-                context = sentence_text[:50] + "..." if len(sentence_text) > 50 else sentence_text
+                context = sentence_text
             
             # Clean up context
             context = re.sub(r'\s+', ' ', context).strip()
@@ -282,56 +386,85 @@ def extract_dates(text: str, nlp) -> List[Dict[str, str]]:
 def extract_dates_fallback(text: str) -> List[Dict[str, str]]:
     """Fallback date extraction using regex when NLP model is not available"""
     import re
-    
-    # Common date patterns
+
+    # Enhanced date patterns to capture more comprehensive date references
     date_patterns = [
-        r'\b\d{1,2}\s+years?\s+old\b',
-        r'\b\d+\s+days?\b',
-        r'\b\d+\s+months?\b',
-        r'\bup to \d+\s+days?\b',
-        r'\bat least \d+\s+days?\b',
-        r'\bwithin \d+\s+days?\b',
+        r'\b\d{1,2}[-/]\d{1,2}[-/]\d{2,4}\b',  # Date formats like 12/31/2023
+        r'\b\d+\s+calendar\s+days?\b',  # calendar days
+        r'\b\d+[-–]\s*calendar\s+days?\b',  # 45-calendar days
+        r'\bno late[r]? than \d+\s*calendar\s+days?\b',
+        r'\bwithin \d+[-–]\s*calendar\s+days?\b',
+        r'\b(?:thirty|ten|five|three|sixty|ninety)[-–]?\s*days?\b',  # Written numbers with days
+        r'\bthirty[-–]\s*day\b',
+        r'\b\d{1,2}\s+years?\s+(?:old|after|from|period)\b',  # years with context
+        r'\b(?:within|up to|at least|no later than)\s+\d+\s+days?\b',
+        r'\b(?:within|up to|at least|no later than)\s+\d+\s+(?:work\s+)?days?\b',
+        r'\b\d+\s+months?\s+(?:after|before|from|period)\b',  # months with context
         r'\bbetween the ages? of \d+\b',
         r'\bages? \d+ (?:and|to) \d+\b',
-        r'\banother \d+\s+days?\b'
+        r'\banother \d+\s+days?\b',
+        r'\bperiod of \d+\s+(?:days?|months?|years?)\b',  # period specifications
+        r'\bfor \d+\s+(?:days?|months?|years?)\s+(?:after|from|period)\b',
+        r'\b\d+\s+(?:work\s+)?days?\s+(?:after|before|prior)\b'  # days with temporal context
     ]
     
     dates = []
-    sentences = text.split('.')
+    # Split by periods and other sentence endings for better sentence detection
+    sentences = re.split(r'[.!?]+', text)
     
     for pattern in date_patterns:
         for match in re.finditer(pattern, text, re.IGNORECASE):
             date_text = match.group()
+            match_start = match.start()
+            match_end = match.end()
             
-            # Find which sentence contains this date
+            # Find which sentence contains this date by position
+            best_sentence = ""
+            sentence_start = 0
+            
             for sentence in sentences:
-                if date_text.lower() in sentence.lower():
-                    # Extract context with complete words
-                    words = sentence.split()
-                    date_word_idx = -1
+                sentence = sentence.strip()
+                if not sentence:
+                    continue
                     
-                    for i, word in enumerate(words):
-                        if any(date_word.lower() in word.lower() for date_word in date_text.split()):
-                            date_word_idx = i
-                            break
-                    
-                    if date_word_idx != -1:
-                        context_start = max(0, date_word_idx - 5)
-                        context_end = min(len(words), date_word_idx + 6)
-                        context = ' '.join(words[context_start:context_end])
-                    else:
-                        context = sentence[:80] + "..." if len(sentence) > 80 else sentence
-                    
-                    description = create_date_description(date_text, sentence)
-                    
+                sentence_end = sentence_start + len(sentence)
+                
+                # Check if the match falls within this sentence
+                if sentence_start <= match_start <= sentence_end:
+                    best_sentence = sentence
+                    break
+                
+                sentence_start = text.find(sentence, sentence_start) + len(sentence)
+            
+            if not best_sentence:
+                # Fallback: find sentence containing the date text
+                for sentence in sentences:
+                    if date_text.lower() in sentence.lower():
+                        best_sentence = sentence.strip()
+                        break
+            
+            if best_sentence:
+                # Create meaningful context that explains what the date is for
+                context = create_meaningful_context(date_text, best_sentence)
+                context = re.sub(r'\s+', ' ', context).strip()
+                
+                description = create_date_description(date_text, best_sentence)
+                
+                # Check for duplicates before adding
+                is_duplicate = False
+                for existing_date in dates:
+                    if existing_date['date'].lower() == date_text.lower() and existing_date['context'].lower() == context.lower():
+                        is_duplicate = True
+                        break
+                
+                if not is_duplicate:
                     dates.append({
                         'date': date_text,
-                        'context': context.strip(),
+                        'context': context,
                         'description': description,
-                        'full_sentence': sentence.strip(),
-                        'category': categorize_date(date_text, sentence)
+                        'full_sentence': best_sentence,
+                        'category': categorize_date(date_text, best_sentence)
                     })
-                    break
     
     return dates
 
@@ -341,9 +474,9 @@ def create_date_description(date_text: str, sentence: str) -> str:
     sentence_lower = sentence.lower()
     
     # Age requirements
-    if 'years old' in date_lower or 'age' in sentence_lower:
+    if 'years old' in date_lower or ('age' in sentence_lower and 'years' in date_lower):
         if 'under' in sentence_lower or 'less than' in sentence_lower:
-            return f"Minimum age requirement: {date_text}"
+            return f"Maximum age requirement: {date_text}"
         elif 'over' in sentence_lower or 'at least' in sentence_lower:
             return f"Minimum age requirement: {date_text}"
         elif 'between' in sentence_lower:
@@ -351,14 +484,28 @@ def create_date_description(date_text: str, sentence: str) -> str:
         else:
             return f"Age requirement: {date_text}"
     
+    # Deadlines and submission requirements
+    elif 'no later than' in sentence_lower or 'deadline' in sentence_lower:
+        return f"Submission deadline: {date_text}"
+    elif 'within' in sentence_lower and ('submit' in sentence_lower or 'file' in sentence_lower or 'provide' in sentence_lower):
+        return f"Submission deadline: {date_text}"
+    
+    # Notice periods
+    elif 'notice' in sentence_lower or 'notify' in sentence_lower:
+        return f"Notice requirement: {date_text}"
+    
     # Time periods and deadlines
-    elif 'days' in date_lower:
-        if 'notify' in sentence_lower or 'notice' in sentence_lower:
-            return f"Notice period: {date_text}"
+    elif 'days' in date_lower or 'day' in date_lower:
+        if 'terminate' in sentence_lower or 'cancel' in sentence_lower:
+            return f"Termination notice period: {date_text}"
+        elif 'remedy' in sentence_lower or 'cure' in sentence_lower or 'correct' in sentence_lower:
+            return f"Cure period: {date_text}"
+        elif 'pay' in sentence_lower or 'payment' in sentence_lower:
+            return f"Payment deadline: {date_text}"
         elif 'delete' in sentence_lower or 'removal' in sentence_lower:
             return f"Deletion timeframe: {date_text}"
         elif 'within' in sentence_lower:
-            return f"Deadline: {date_text}"
+            return f"Compliance deadline: {date_text}"
         elif 'up to' in sentence_lower:
             return f"Maximum duration: {date_text}"
         else:
@@ -366,10 +513,21 @@ def create_date_description(date_text: str, sentence: str) -> str:
     
     # Months/Years
     elif 'month' in date_lower or 'year' in date_lower:
-        if 'retain' in sentence_lower or 'keep' in sentence_lower:
+        if 'retain' in sentence_lower or 'keep' in sentence_lower or 'maintain' in sentence_lower:
             return f"Retention period: {date_text}"
+        elif 'coverage' in sentence_lower or 'insurance' in sentence_lower:
+            return f"Coverage period: {date_text}"
+        elif 'period' in sentence_lower:
+            return f"Duration period: {date_text}"
         else:
-            return f"Duration: {date_text}"
+            return f"Time duration: {date_text}"
+    
+    # Calendar days specifically
+    elif 'calendar' in sentence_lower:
+        if 'submit' in sentence_lower or 'file' in sentence_lower:
+            return f"Submission deadline: {date_text}"
+        else:
+            return f"Statutory timeframe: {date_text}"
     
     else:
         return f"Important timeframe: {date_text}"
@@ -379,16 +537,28 @@ def categorize_date(date_text: str, sentence: str) -> str:
     date_lower = date_text.lower()
     sentence_lower = sentence.lower()
     
-    if 'years old' in date_lower or 'age' in sentence_lower:
+    if 'years old' in date_lower or ('age' in sentence_lower and 'years' in date_lower):
         return "Age Requirements"
+    elif 'submit' in sentence_lower or 'file' in sentence_lower or 'no later than' in sentence_lower:
+        return "Submission Deadlines"
     elif 'notice' in sentence_lower or 'notify' in sentence_lower:
-        return "Notice Periods"
-    elif 'delete' in sentence_lower or 'remove' in sentence_lower:
-        return "Deletion/Removal Timeframes"
-    elif 'deadline' in sentence_lower or 'within' in sentence_lower:
-        return "Deadlines"
-    elif 'retain' in sentence_lower or 'keep' in sentence_lower:
+        return "Notice Requirements"
+    elif 'terminate' in sentence_lower or 'cancel' in sentence_lower:
+        return "Termination Periods"
+    elif 'remedy' in sentence_lower or 'cure' in sentence_lower or 'correct' in sentence_lower:
+        return "Cure Periods"
+    elif 'pay' in sentence_lower or 'payment' in sentence_lower:
+        return "Payment Deadlines"
+    elif 'coverage' in sentence_lower or 'insurance' in sentence_lower:
+        return "Insurance Periods"
+    elif 'retain' in sentence_lower or 'keep' in sentence_lower or 'maintain' in sentence_lower:
         return "Retention Periods"
+    elif 'delete' in sentence_lower or 'remove' in sentence_lower:
+        return "Deletion Timeframes"
+    elif 'calendar' in sentence_lower:
+        return "Statutory Timeframes"
+    elif 'within' in sentence_lower or 'deadline' in sentence_lower:
+        return "Compliance Deadlines"
     else:
         return "General Timeframes"
 
