@@ -109,6 +109,49 @@ def save_analysis(user, analysis, final_report=None):
         logger.error(f"=== SAVE ERROR: {error_msg} ===")
         raise Exception(error_msg)
 
+def delete_analysis(user, analysis_name):
+    """Delete a specific analysis from Firebase."""
+    logger.info("=== DELETE_ANALYSIS FUNCTION CALLED ===")
+    logger.info(f"User provided: {user is not None}")
+    logger.info(f"Analysis name: {analysis_name}")
+    
+    try:
+        # Ensure we have a fresh token
+        user = refresh_user_token(user)
+        
+        # Get user ID with fallback
+        user_id = user.get('localId')
+        if not user_id:
+            user_id = user.get('email', 'unknown_user')
+            logger.warning(f"No localId found, using email as fallback: {user_id}")
+        
+        logger.info(f"User ID: {user_id}")
+        
+        # Check if token exists
+        token = user.get('idToken')
+        if not token:
+            raise Exception("No authentication token found - please log in again")
+        
+        logger.info("Token validated successfully")
+        
+        # Delete from database
+        try:
+            logger.info(f"Attempting to delete analysis: {analysis_name}")
+            db.child("analyses").child(user_id).child(analysis_name).remove(token)
+            logger.info("=== DELETE SUCCESSFUL ===")
+            return True
+        except Exception as db_error:
+            logger.error(f"Database error occurred: {str(db_error)}")
+            if "auth" in str(db_error).lower() or "unauthorized" in str(db_error).lower() or "permission" in str(db_error).lower():
+                raise Exception("Authentication expired - please log out and log back in")
+            else:
+                raise Exception(f"Database error: {str(db_error)}")
+        
+    except Exception as e:
+        error_msg = f"Error deleting analysis: {str(e)}"
+        logger.error(f"=== DELETE ERROR: {error_msg} ===")
+        raise Exception(error_msg)
+
 def get_saved_analyses(user):
     """Get all saved analyses for a user."""
     try:

@@ -11,7 +11,8 @@ from nlp_utils import (
     preprocess_text, segment_clauses, summarize_clause
 )
 from pdf_utils import extract_text_from_pdf
-from save_analysis import get_saved_analyses, save_analysis
+from save_analysis import get_saved_analyses, save_analysis, delete_analysis
+from datetime import datetime
 
 # ---------------- Load user session on reload ---------------- #
 load_session()
@@ -142,8 +143,6 @@ def main_app():
         else:
             text = uploaded_file.read().decode("utf-8")
 
-        st.write("**Raw Extracted Text (Debug):**")
-        st.text_area("Raw Text", text[:1000], height=200)
 
         with st.spinner("Analyzing document..."):
             analysis = analyze_document(text, models, lang=lang_code)
@@ -301,9 +300,55 @@ def sidebar_auth():
         st.header("📁 Your Saved Analysis Reports")
         
         if saved:
-            st.write(f"Found {len(saved)} saved report(s)")
+            st.subheader("Filters")
+            col1, col2 = st.columns(2)
+            with col1:
+                start_date = st.date_input("Start Date", value=None)
+            with col2:
+                end_date = st.date_input("End Date", value=None)
+            col3, col4 = st.columns(2)
+            with col3:
+                keyword = st.text_input("Keyword Search")
+            with col4:
+                unique_types = sorted(set(item.get("document_info", {}).get("type", "Unknown") for item in saved))
+                doc_type = st.selectbox("Document Type", ["All"] + unique_types)
+
+            filtered_saved = []
+            for item in saved:
+                date_match = True
+                if 'timestamp' in item:
+                    item_date = datetime.fromtimestamp(item["timestamp"])
+                    if start_date:
+                        date_match = date_match and (item_date.date() >= start_date)
+                    if end_date:
+                        date_match = date_match and (item_date.date() <= end_date)
+                
+                keyword_match = True
+                if keyword:
+                    search_text = ""
+                    if 'name' in item:
+                        search_text += item['name'] + " "
+                    if 'document_info' in item:
+                        search_text += item['document_info'].get('title', '') + " "
+                    if 'final_report' in item:
+                        search_text += item['final_report'] + " "
+                    if 'basic_summary' in item:
+                        search_text += item['basic_summary'] + " "
+                    keyword_match = keyword.lower() in search_text.lower()
+                
+                type_match = True
+                if doc_type != "All":
+                    type_match = item.get("document_info", {}).get("type", "Unknown") == doc_type
+                
+                if date_match and keyword_match and type_match:
+                    filtered_saved.append(item)
+
+            # Sort by timestamp descending
+            filtered_saved.sort(key=lambda x: x.get('timestamp', 0), reverse=True)
+
+            st.write(f"Found {len(filtered_saved)} saved report(s)")
             
-            for idx, item in enumerate(saved, 1):
+            for idx, item in enumerate(filtered_saved, 1):
                 display_name = item.get("name", f"Analysis {idx}")
                 timestamp = item.get('timestamp')
                 if timestamp and isinstance(timestamp, (int, float)):
@@ -334,18 +379,42 @@ def sidebar_auth():
                         st.subheader("📋 Final Analysis Report")
                         st.text_area("Report Content", item["final_report"], height=400, key=f"report_{idx}")
                         
-                        st.download_button(
-                            label="📥 Download This Report",
-                            data=item["final_report"],
-                            file_name=f"{display_name}_report.txt",
-                            mime="text/plain",
-                            key=f"download_{idx}"
-                        )
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.download_button(
+                                label="📥 Download This Report",
+                                data=item["final_report"],
+                                file_name=f"{display_name}_report.txt",
+                                mime="text/plain",
+                                key=f"download_{idx}"
+                            )
+                        with col2:
+                            if st.button("🗑️ Delete This Report", key=f"delete_{idx}"):
+                                try:
+                                    delete_analysis(st.session_state["user"], display_name)
+                                    st.success(f"Report '{display_name}' deleted successfully!")
+                                    st.rerun()
+                                except Exception as e:
+                                    st.error(f"Error deleting report: {e}")
                     elif item.get("basic_summary"):
                         st.subheader("📝 Analysis Summary")
                         st.text_area("Summary", item["basic_summary"], height=200, key=f"summary_{idx}")
+                        if st.button("🗑️ Delete This Report", key=f"delete_{idx}"):
+                            try:
+                                delete_analysis(st.session_state["user"], display_name)
+                                st.success(f"Report '{display_name}' deleted successfully!")
+                                st.rerun()
+                            except Exception as e:
+                                st.error(f"Error deleting report: {e}")
                     else:
                         st.warning("⚠️ No final report available for this analysis. This might be an older save format.")
+                        if st.button("🗑️ Delete This Report", key=f"delete_{idx}"):
+                            try:
+                                delete_analysis(st.session_state["user"], display_name)
+                                st.success(f"Report '{display_name}' deleted successfully!")
+                                st.rerun()
+                            except Exception as e:
+                                st.error(f"Error deleting report: {e}")
         else:
             st.info("📭 No saved reports found. Analyze a document and save the final report to see it here.")
 
