@@ -7,14 +7,9 @@ from bnlp import BasicTokenizer, BengaliNER
 import torch
 from transformers import pipeline
 
-import torch
-
-
 # Load models (do this once at startup)
 @st.cache_resource
 def load_models():
-    print(torch.cuda.is_available())
-    print(torch.cuda.get_device_name(0))
     # Load English spaCy model
     try:
         # Try multiple ways to load the model
