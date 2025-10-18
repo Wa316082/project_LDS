@@ -31,3 +31,16 @@ gcloud>=0.18.0
 oauth2client>=4.1.0
 pycryptodome>=3.20.0
 python-jwt>=4.0.0
+
+
+bnlp_toolkit>=4.0.0
+langdetect>=1.0.9
+
+transformers>=4.44.0
+torch>=2.0.0+cu121
+langdetect>=1.0.9
+scipy>=1.14.0
+
+pdfplumber>=0.10.0
+pdf2image>=1.16.0
+pytesseract>=0.3.10

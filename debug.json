@@ -1,0 +1,285 @@
+{
+  "document_info": {
+    "title": "Legal Document",
+    "type": "Agreement",
+    "purpose": "N/A"
+  },
+  "metadata": { "length": 30271, "estimated_clauses": 1 },
+  "clauses": [
+    {
+      "title": "Paragraph 1",
+      "classification": {
+        "type": "Payment Terms",
+        "confidence": "Medium",
+        "explanation": "Specifies financial obligations and payment conditions"
+      },
+      "summary": "Error summarizing clause: index out of range in self",
+      "important_points": [
+        "Sample Contract Contract No.___________",
+        "PROFESSIONAL SERVICES AGREEMENT THIS AGREEMENT made and entered into this _______day of , 20 by and between the SANTA CRUZ COUNTY REGIONAL TRANSPORTATION COMMISSION, hereinafter called COMMISSION, and ________ ____, hereinafter called CONSULTANT for __________________ .",
+        "1. DUTIES.",
+        "A. CONSULTANT agrees to exercise special skill to accomplish the following results in a manner reasonably satisfactory to COMMISSION: ______________________________, as specified in Exhibit A: Scope of Services, which by this reference is incorporated herein.",
+        "B. CONSULTANT shall provide the personnel listed below to perform the above-specified services, which persons are hereby designated as key personnel under this Agreement."
+      ],
+      "obligations": {
+        "Party": [
+          "CONSULTANT agrees to exercise special skill to accomplish the following results in a manner reasonably satisfactory to COMMISSION: ______________________________, as specified in Exhibit A: Scope of Services, which by this reference is incorporated herein.",
+          "In consideration for CONSULTANT accomplishing said result, COMMISSION agrees to pay CONSULTANT as follows: A.",
+          "Other Insurance Provisions 1) If any insurance coverage required in this Agreement is provided on a “Claims Made” rather than “Occurrence” form, CONSULTANT agrees to maintain the required coverage for a period of three years after the expiration of this Agreement and any extensions thereof.",
+          "” 3) All required insurance policies shall be endorsed to contain the following clause: “This insurance shall not be canceled until after thirty days prior written notice has been given to: Santa Cruz County Regional Transportation Commission Attn: Yesenia Parra 1523 Pacific Avenue Santa Cruz, CA 95060 4) CONSULTANT agrees to provide its insurance broker with a full copy of these insurance provisions and provide COMMISSION on or before the effective date of this Agreement with Certificates of Insurance for all required coverages.",
+          "In the event said insurance coverage expires at any time or times during the term of this contract, the CONSULTANT agrees to provide at least thirty days prior notice to said expiration date; and a new Certificate of Insurance evidencing insurance coverage as provided for herein, for not less than either the remainder of the term of the contract, or for a period of not less than one year.",
+          "The COMMISSION agrees to cooperate and work with the CONSULTANT in an effort to resolve any conflict.",
+          "During and in relation to the performance of this Agreement, CONSULTANT agrees to the following: The CONSULTANT shall not discriminate or permit discrimination against any employee or applicant for employment in any manner prohibited by Federal, State and local laws, including but not limited to race, color, gender, religion, national origin, ancestry, physical or mental disability, medical condition, marital status, sexual orientation, age , veteran status, pregnancy, or any other non-merit factor unrelated to job duties.",
+          "The CONSULTANT agrees to post in conspicuous places, available to employees and applicants for employment, notice setting forth the provisions of this non- discrimination clause.",
+          "parties shall make such materials available at their respective offices at all reasonable times during the Agreement period and for five years from the date of final payment under this Agreement or until a final audit report is accepted by COMMISSION, whichever occurs first.",
+          "party a comparable and coextensive sublicense. CONSULTANT shall include in any subcontract with a third party for work under this Agreement terms that preserve the rights, interests, and obligations created by this Section, and that identify the COMMISSION as a third-party beneficiary of those provisions.",
+          "party for that purpose. A. Upon completion of all work under this contract, ownership and title to all custom letters, reports, documents, plans, specifications, and estimates and other products produced as part of this Agreement will automatically be vested in the COMMISSION; and no further agreement will be necessary to transfer ownership to the COMMISSION. The CONSULTANT shall furnish the COMMISSION all necessary copies of data needed to complete the review and approval process.",
+          "party without the express prior written consent of COMMISSION. No information obtained during audit work performed under this Agreement may be used by CONSULTANT for any purpose , nor may the information be discussed with others without the prior written consent of COMMISSION. B. Any subcontract in excess of $25,000 entered into as a result of this contract, shall contain all of the provisions of this Section.",
+          "parties. B. The CONSULTANT shall only commence work covered by an amendment after the amendment is executed and notification to proceed has been provided by the COMMISSION’s Contract Manager.",
+          "parties. 18. DISPUTES. This Agreement shall be construed under the laws of the State of California.",
+          "parties to this Agreement, who are the before named CONSULTANT and the before named COMMISSION, hereby agree that this Agreement constitutes the entire Agreement which is made and concluded in duplicate between the two parties. Both of these parties for and in consideration of the payments to made, conditions mentioned, and work to be performed; each agree to diligently perform in accordance with the terms and conditions of this Agreement as evidenced by the signatures below. B. COMMISSION DESIGNEE: The Executive Director of COMMISSION, or his or her designee, shall have the authority to act for and exercise any of the rights of COMMISSION as set forth in this Agreement subsequent to, and in accordance with the authorization granted by the COMMISSION."
+        ],
+        "COMMISSION": [
+          "No person named in paragraph B of this Section, or his or her successor, shall be removed or replaced by CONSULTANT, nor shall his or her agreed-upon function hereunder be changed, without the prior written consent of COMMISSION.",
+          "2) The CONSULTANT’s Project Manager shall meet with the COMMISSION’s Contract Manager, as needed, to discuss progress on the contract.",
+          "No person named in paragraph B of this Section, or his or her successor, shall be removed or replaced by CONSULTANT, nor shall his or her agreed-upon function hereunder be changed, without the prior written consent of COMMISSION.",
+          "2) The CONSULTANT’s Project Manager shall meet with the COMMISSION’s Contract Manager, as needed, to discuss progress on the contract.",
+          "No person named in paragraph B of this Section, or his or her successor, shall be removed or replaced by CONSULTANT, nor shall his or her agreed-upon function hereunder be changed, without the prior written consent of COMMISSION.",
+          "2) The CONSULTANT’s Project Manager shall meet with the COMMISSION’s Contract Manager, as needed, to discuss progress on the contract."
+        ]
+      },
+      "dates": [
+        {
+          "date": "monthly",
+          "context": "E. Progress payments will be made no less than monthly in arrears based on satisfactory services provided and actual allowable incurred costs.",
+          "category": "General Timeframes"
+        },
+        {
+          "date": "later than 45calendar days",
+          "context": "Invoices shall be submitted no later than 45calendar days after the performance of work for which the CONSULTANT is billing.",
+          "category": "General Timeframes"
+        },
+        {
+          "date": "1523",
+          "context": "Invoices shall be mailed to the COMMISSION’s Contract Manager at the following address: SCCRTC, 1523 Pacific Ave, Santa Cruz, CA, 95060",
+          "category": "General Timeframes"
+        },
+        {
+          "date": "95060",
+          "context": "Invoices shall be mailed to the COMMISSION’s Contract Manager at the following address: SCCRTC, 1523 Pacific Ave, Santa Cruz, CA, 95060",
+          "category": "General Timeframes"
+        },
+        {
+          "date": "60-calendar days",
+          "context": "7. CONSULTANT's final invoice must be submitted within 60-calendar days after acceptance of the CONSULTANT’s work by the Contract Manager.",
+          "category": "General Timeframes"
+        },
+        {
+          "date": "thirty-day",
+          "context": "A. COMMISSION may terminate this Agreement for its convenience any time, in whole or part, by giving CONSULTANT thirty-day  written notice thereof.",
+          "category": "General Timeframes"
+        },
+        {
+          "date": "thirty days",
+          "context": "Within thirty days of the COMMISSION's receipt of CONSULTANT's final billing, COMMISSION shall pay CONSULTANT its allowable costs incurred to date of termination and those allowable costs determined by COMMISSION to be reasonably necessary to effect such termination.",
+          "category": "General Timeframes"
+        },
+        {
+          "date": "ten  days",
+          "context": "B. COMMISSION may terminate this Agreement for CONSULTANT's default if a federal or state proceeding for the relief of debtors is undertaken by or against CONSULTANT, or CONSULTANT's Page 2principal, or if CONSULTANT or CONSULTANT's principal makes an assignment for the benefit of creditors, or if CONSULTANT breaches any term or violates any provision of this Agreement and does not cure such breach or violation within ten  days after written notice thereof by COMMISSION.",
+          "category": "General Timeframes"
+        },
+        {
+          "date": "three  years",
+          "context": "If any insurance coverage required in this Agreement is provided on a “Claims Made” rather than “Occurrence” form, CONSULTANT agrees to maintain the required coverage for a period of three  years after the expiration of this Agreement  and any extensions thereof.",
+          "category": "General Timeframes"
+        },
+        {
+          "date": "thirty  days",
+          "context": "3) All required insurance policies shall be endorsed to contain the following clause: “This insurance shall not be canceled until after thirty  days prior written notice has been given to: Santa Cruz County Regional Transportation Commission Attn: Yesenia Parra 1523 Pacific Avenue Santa Cruz, CA 95060 4) CONSULTANT agrees to provide its insurance broker with a full copy of these insurance provisions and provide COMMISSION on or before the effective date of this Agreement with Certificates of Insurance for all required coverages.",
+          "category": "General Timeframes"
+        },
+        {
+          "date": "95060 5",
+          "context": "All Certificates of Insurance shall be delivered or sent to: Santa Cruz County Regional Transportation Commission Attn: Yesenia Parra 1523 Pacific Avenue Santa Cruz, CA 95060 5)",
+          "category": "General Timeframes"
+        },
+        {
+          "date": "five  work days",
+          "context": "7) CONSULTANT shall do all things required to be performed by it pursuant to its insurance policies including but not limited to paying within five  work days, all deductibles and self-insured retentions  required to be paid under any insurance policy that may provide defense or indemnity coverage to COMMISSION or any additional insured.",
+          "category": "General Timeframes"
+        },
+        {
+          "date": "10115",
+          "context": "For the purpose of determining compliance with Public Contract Code 10115, et seq.",
+          "category": "General Timeframes"
+        },
+        {
+          "date": "five  years",
+          "context": "All parties shall make such materials available at their respective offices at all reasonable times during the Agreement period and for five  years from the date of final payment under this Agreement or until a final audit report is accepted by COMMISSION, whichever occurs first.",
+          "category": "General Timeframes"
+        },
+        {
+          "date": "daily",
+          "context": "INSPECTION OF WORK The CONSULTANT and any subconsultant shall permit the COMMISSION, the state, and the FHWA if federal participating funds are used in this contract, to review and inspect the project activities and files at all reasonable times during the term of this Agreement including review and inspection on a daily basis.",
+          "category": "General Timeframes"
+        },
+        {
+          "date": "12",
+          "context": "The CONSULTANT shall comply with all of the requirements set forth in Divisions 11, 12, 13, 14, and 15 of the Vehicle Code.",
+          "category": "General Timeframes"
+        },
+        {
+          "date": "13",
+          "context": "The CONSULTANT shall comply with all of the requirements set forth in Divisions 11, 12, 13, 14, and 15 of the Vehicle Code.",
+          "category": "General Timeframes"
+        },
+        {
+          "date": "14",
+          "context": "The CONSULTANT shall comply with all of the requirements set forth in Divisions 11, 12, 13, 14, and 15 of the Vehicle Code.",
+          "category": "General Timeframes"
+        },
+        {
+          "date": "later than 30 days",
+          "context": "B. Not later than 30 days after completion of all deliverables necessary to complete the plans, specifications and estimate, the CONSULTANT may request review by the COMMISSION GOVERNING BOARD of unresolved claims or disputes, other than audit.",
+          "category": "General Timeframes"
+        },
+        {
+          "date": "CA 95060",
+          "context": "COMMISSION: Santa Cruz County Regional Transportation Commission  Luis Mendez, Contract Manager 1523 Pacific Ave, Santa Cruz, CA 95060 24.",
+          "category": "General Timeframes"
+        }
+      ],
+      "full_text": "Sample Contract Contract No.___________ PROFESSIONAL SERVICES AGREEMENT THIS AGREEMENT made and entered into this _______day of , 20 by and between the SANTA CRUZ COUNTY REGIONAL TRANSPORTATION COMMISSION, hereinafter called COMMISSION, and ________ ____, hereinafter called CONSULTANT for __________________ . 1. DUTIES. A. CONSULTANT agrees to exercise special skill to accomplish the following results in a manner reasonably satisfactory to COMMISSION: ______________________________, as specified in Exhibit A: Scope of Services, which by this reference is incorporated herein. B. CONSULTANT shall provide the personnel listed below to perform the above-specified services, which persons are hereby designated as key personnel under this Agreement. Name Firm Function Principal in Charge Project Manager C. No person named in paragraph B of this Section, or his or her successor, shall be removed or replaced by CONSULTANT, nor shall his or her agreed-upon function hereunder be changed, without "
+    }
+  ],
+  "all_dates": [
+    {
+      "date": "monthly",
+      "context": "E. Progress payments will be made no less than monthly in arrears based on satisfactory services provided and actual allowable incurred costs.",
+      "category": "General Timeframes"
+    },
+    {
+      "date": "later than 45calendar days",
+      "context": "Invoices shall be submitted no later than 45calendar days after the performance of work for which the CONSULTANT is billing.",
+      "category": "General Timeframes"
+    },
+    {
+      "date": "1523",
+      "context": "Invoices shall be mailed to the COMMISSION’s Contract Manager at the following address: SCCRTC, 1523 Pacific Ave, Santa Cruz, CA, 95060",
+      "category": "General Timeframes"
+    },
+    {
+      "date": "95060",
+      "context": "Invoices shall be mailed to the COMMISSION’s Contract Manager at the following address: SCCRTC, 1523 Pacific Ave, Santa Cruz, CA, 95060",
+      "category": "General Timeframes"
+    },
+    {
+      "date": "60-calendar days",
+      "context": "7. CONSULTANT's final invoice must be submitted within 60-calendar days after acceptance of the CONSULTANT’s work by the Contract Manager.",
+      "category": "General Timeframes"
+    },
+    {
+      "date": "thirty-day",
+      "context": "A. COMMISSION may terminate this Agreement for its convenience any time, in whole or part, by giving CONSULTANT thirty-day  written notice thereof.",
+      "category": "General Timeframes"
+    },
+    {
+      "date": "thirty days",
+      "context": "Within thirty days of the COMMISSION's receipt of CONSULTANT's final billing, COMMISSION shall pay CONSULTANT its allowable costs incurred to date of termination and those allowable costs determined by COMMISSION to be reasonably necessary to effect such termination.",
+      "category": "General Timeframes"
+    },
+    {
+      "date": "ten  days",
+      "context": "B. COMMISSION may terminate this Agreement for CONSULTANT's default if a federal or state proceeding for the relief of debtors is undertaken by or against CONSULTANT, or CONSULTANT's Page 2principal, or if CONSULTANT or CONSULTANT's principal makes an assignment for the benefit of creditors, or if CONSULTANT breaches any term or violates any provision of this Agreement and does not cure such breach or violation within ten  days after written notice thereof by COMMISSION.",
+      "category": "General Timeframes"
+    },
+    {
+      "date": "three  years",
+      "context": "If any insurance coverage required in this Agreement is provided on a “Claims Made” rather than “Occurrence” form, CONSULTANT agrees to maintain the required coverage for a period of three  years after the expiration of this Agreement  and any extensions thereof.",
+      "category": "General Timeframes"
+    },
+    {
+      "date": "thirty  days",
+      "context": "3) All required insurance policies shall be endorsed to contain the following clause: “This insurance shall not be canceled until after thirty  days prior written notice has been given to: Santa Cruz County Regional Transportation Commission Attn: Yesenia Parra 1523 Pacific Avenue Santa Cruz, CA 95060 4) CONSULTANT agrees to provide its insurance broker with a full copy of these insurance provisions and provide COMMISSION on or before the effective date of this Agreement with Certificates of Insurance for all required coverages.",
+      "category": "General Timeframes"
+    },
+    {
+      "date": "95060 5",
+      "context": "All Certificates of Insurance shall be delivered or sent to: Santa Cruz County Regional Transportation Commission Attn: Yesenia Parra 1523 Pacific Avenue Santa Cruz, CA 95060 5)",
+      "category": "General Timeframes"
+    },
+    {
+      "date": "five  work days",
+      "context": "7) CONSULTANT shall do all things required to be performed by it pursuant to its insurance policies including but not limited to paying within five  work days, all deductibles and self-insured retentions  required to be paid under any insurance policy that may provide defense or indemnity coverage to COMMISSION or any additional insured.",
+      "category": "General Timeframes"
+    },
+    {
+      "date": "10115",
+      "context": "For the purpose of determining compliance with Public Contract Code 10115, et seq.",
+      "category": "General Timeframes"
+    },
+    {
+      "date": "five  years",
+      "context": "All parties shall make such materials available at their respective offices at all reasonable times during the Agreement period and for five  years from the date of final payment under this Agreement or until a final audit report is accepted by COMMISSION, whichever occurs first.",
+      "category": "General Timeframes"
+    },
+    {
+      "date": "daily",
+      "context": "INSPECTION OF WORK The CONSULTANT and any subconsultant shall permit the COMMISSION, the state, and the FHWA if federal participating funds are used in this contract, to review and inspect the project activities and files at all reasonable times during the term of this Agreement including review and inspection on a daily basis.",
+      "category": "General Timeframes"
+    },
+    {
+      "date": "12",
+      "context": "The CONSULTANT shall comply with all of the requirements set forth in Divisions 11, 12, 13, 14, and 15 of the Vehicle Code.",
+      "category": "General Timeframes"
+    },
+    {
+      "date": "13",
+      "context": "The CONSULTANT shall comply with all of the requirements set forth in Divisions 11, 12, 13, 14, and 15 of the Vehicle Code.",
+      "category": "General Timeframes"
+    },
+    {
+      "date": "14",
+      "context": "The CONSULTANT shall comply with all of the requirements set forth in Divisions 11, 12, 13, 14, and 15 of the Vehicle Code.",
+      "category": "General Timeframes"
+    },
+    {
+      "date": "later than 30 days",
+      "context": "B. Not later than 30 days after completion of all deliverables necessary to complete the plans, specifications and estimate, the CONSULTANT may request review by the COMMISSION GOVERNING BOARD of unresolved claims or disputes, other than audit.",
+      "category": "General Timeframes"
+    },
+    {
+      "date": "CA 95060",
+      "context": "COMMISSION: Santa Cruz County Regional Transportation Commission  Luis Mendez, Contract Manager 1523 Pacific Ave, Santa Cruz, CA 95060 24.",
+      "category": "General Timeframes"
+    }
+  ],
+  "all_obligations": {
+    "Party": [
+      "CONSULTANT agrees to exercise special skill to accomplish the following results in a manner reasonably satisfactory to COMMISSION: ______________________________, as specified in Exhibit A: Scope of Services, which by this reference is incorporated herein.",
+      "In consideration for CONSULTANT accomplishing said result, COMMISSION agrees to pay CONSULTANT as follows: A.",
+      "Other Insurance Provisions 1) If any insurance coverage required in this Agreement is provided on a “Claims Made” rather than “Occurrence” form, CONSULTANT agrees to maintain the required coverage for a period of three years after the expiration of this Agreement and any extensions thereof.",
+      "” 3) All required insurance policies shall be endorsed to contain the following clause: “This insurance shall not be canceled until after thirty days prior written notice has been given to: Santa Cruz County Regional Transportation Commission Attn: Yesenia Parra 1523 Pacific Avenue Santa Cruz, CA 95060 4) CONSULTANT agrees to provide its insurance broker with a full copy of these insurance provisions and provide COMMISSION on or before the effective date of this Agreement with Certificates of Insurance for all required coverages.",
+      "In the event said insurance coverage expires at any time or times during the term of this contract, the CONSULTANT agrees to provide at least thirty days prior notice to said expiration date; and a new Certificate of Insurance evidencing insurance coverage as provided for herein, for not less than either the remainder of the term of the contract, or for a period of not less than one year.",
+      "The COMMISSION agrees to cooperate and work with the CONSULTANT in an effort to resolve any conflict.",
+      "During and in relation to the performance of this Agreement, CONSULTANT agrees to the following: The CONSULTANT shall not discriminate or permit discrimination against any employee or applicant for employment in any manner prohibited by Federal, State and local laws, including but not limited to race, color, gender, religion, national origin, ancestry, physical or mental disability, medical condition, marital status, sexual orientation, age , veteran status, pregnancy, or any other non-merit factor unrelated to job duties.",
+      "The CONSULTANT agrees to post in conspicuous places, available to employees and applicants for employment, notice setting forth the provisions of this non- discrimination clause.",
+      "parties shall make such materials available at their respective offices at all reasonable times during the Agreement period and for five years from the date of final payment under this Agreement or until a final audit report is accepted by COMMISSION, whichever occurs first.",
+      "party a comparable and coextensive sublicense. CONSULTANT shall include in any subcontract with a third party for work under this Agreement terms that preserve the rights, interests, and obligations created by this Section, and that identify the COMMISSION as a third-party beneficiary of those provisions.",
+      "party for that purpose. A. Upon completion of all work under this contract, ownership and title to all custom letters, reports, documents, plans, specifications, and estimates and other products produced as part of this Agreement will automatically be vested in the COMMISSION; and no further agreement will be necessary to transfer ownership to the COMMISSION. The CONSULTANT shall furnish the COMMISSION all necessary copies of data needed to complete the review and approval process.",
+      "party without the express prior written consent of COMMISSION. No information obtained during audit work performed under this Agreement may be used by CONSULTANT for any purpose , nor may the information be discussed with others without the prior written consent of COMMISSION. B. Any subcontract in excess of $25,000 entered into as a result of this contract, shall contain all of the provisions of this Section.",
+      "parties. B. The CONSULTANT shall only commence work covered by an amendment after the amendment is executed and notification to proceed has been provided by the COMMISSION’s Contract Manager.",
+      "parties. 18. DISPUTES. This Agreement shall be construed under the laws of the State of California.",
+      "parties to this Agreement, who are the before named CONSULTANT and the before named COMMISSION, hereby agree that this Agreement constitutes the entire Agreement which is made and concluded in duplicate between the two parties. Both of these parties for and in consideration of the payments to made, conditions mentioned, and work to be performed; each agree to diligently perform in accordance with the terms and conditions of this Agreement as evidenced by the signatures below. B. COMMISSION DESIGNEE: The Executive Director of COMMISSION, or his or her designee, shall have the authority to act for and exercise any of the rights of COMMISSION as set forth in this Agreement subsequent to, and in accordance with the authorization granted by the COMMISSION."
+    ],
+    "COMMISSION": [
+      "No person named in paragraph B of this Section, or his or her successor, shall be removed or replaced by CONSULTANT, nor shall his or her agreed-upon function hereunder be changed, without the prior written consent of COMMISSION.",
+      "2) The CONSULTANT’s Project Manager shall meet with the COMMISSION’s Contract Manager, as needed, to discuss progress on the contract.",
+      "No person named in paragraph B of this Section, or his or her successor, shall be removed or replaced by CONSULTANT, nor shall his or her agreed-upon function hereunder be changed, without the prior written consent of COMMISSION.",
+      "2) The CONSULTANT’s Project Manager shall meet with the COMMISSION’s Contract Manager, as needed, to discuss progress on the contract.",
+      "No person named in paragraph B of this Section, or his or her successor, shall be removed or replaced by CONSULTANT, nor shall his or her agreed-upon function hereunder be changed, without the prior written consent of COMMISSION.",
+      "2) The CONSULTANT’s Project Manager shall meet with the COMMISSION’s Contract Manager, as needed, to discuss progress on the contract."
+    ]
+  }
+}

@@ -2,18 +2,23 @@ from firebase_setup import db, auth
 import time
 import re
 import streamlit as st
+import logging
+
+# Configure logging for debugging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def generate_analysis_name(analysis):
     """
-    Generate a simple name based on document title
+    Generate a simple name based on document title, supporting multilingual titles.
     """
     # Get document title from document_info
     doc_info = analysis.get("document_info", {})
     title = doc_info.get("title", "")
     
     if title and title != "Legal Document":
-        # Clean the title for use as filename
-        clean_title = re.sub(r'[^a-zA-Z0-9\s]', '', title)
+        # Clean the title for use as filename, preserving Bengali characters
+        clean_title = re.sub(r'[^\w\s\u0980-\u09FF]', '', title)  # Allow Bengali Unicode
         clean_title = re.sub(r'\s+', '_', clean_title.strip())[:50]  # Limit length
     else:
         clean_title = "Legal_Document"
@@ -24,23 +29,23 @@ def generate_analysis_name(analysis):
     return f"{clean_title}_{timestamp}"
 
 def refresh_user_token(user):
-    """Refresh the user's ID token if it's expired"""
+    """Refresh the user's ID token if it's expired."""
     try:
         # Try to get account info to check if token is valid
         auth.get_account_info(user.get('idToken'))
+        logger.info("User token is valid")
         return user  # Token is still valid
-    except:
-        # Token is expired, need to refresh from session/cookies
-        # This would normally be handled by the auth system
-        # For now, return the user as-is and let the error bubble up
+    except Exception as e:
+        logger.warning(f"Token refresh failed: {str(e)}")
+        # Token is expired, rely on session/cookies handled by auth.py
         return user
 
 def save_analysis(user, analysis, final_report=None):
-    """Save analysis with final report"""
-    print("=== SAVE_ANALYSIS FUNCTION CALLED ===")
-    print(f"User provided: {user is not None}")
-    print(f"Analysis provided: {analysis is not None}")
-    print(f"Final report provided: {final_report is not None}")
+    """Save analysis with final report to Firebase."""
+    logger.info("=== SAVE_ANALYSIS FUNCTION CALLED ===")
+    logger.info(f"User provided: {user is not None}")
+    logger.info(f"Analysis provided: {analysis is not None}")
+    logger.info(f"Final report provided: {final_report is not None}")
     
     try:
         # Ensure we have a fresh token
@@ -49,27 +54,27 @@ def save_analysis(user, analysis, final_report=None):
         # Get user ID with fallback
         user_id = user.get('localId')
         if not user_id:
-            # Fallback: use email as identifier (not ideal but functional)
             user_id = user.get('email', 'unknown_user')
+            logger.warning(f"No localId found, using email as fallback: {user_id}")
         
-        print(f"User ID: {user_id}")
+        logger.info(f"User ID: {user_id}")
         
         # Check if token exists
         token = user.get('idToken')
         if not token:
             raise Exception("No authentication token found - please log in again")
         
-        print("Token validated successfully")
+        logger.info("Token validated successfully")
         
         name = generate_analysis_name(analysis)
-        print(f"Generated name: {name}")
+        logger.info(f"Generated name: {name}")
         
         # Handle large reports by truncating if necessary
         if final_report and len(final_report) > 100000:  # 100KB limit
             final_report = final_report[:100000] + "\n\n[Report truncated due to size limits]"
-            print("Report truncated due to size")
+            logger.info("Report truncated due to size")
         
-        # Prepare minimal data to save
+        # Prepare data to save
         save_data = {
             "name": name,
             "timestamp": int(time.time()),
@@ -83,18 +88,17 @@ def save_analysis(user, analysis, final_report=None):
             "final_report": final_report or "No report generated"
         }
         
-        print(f"Data prepared for saving, size: {len(str(save_data))} characters")
+        logger.info(f"Data prepared for saving, size: {len(str(save_data))} characters")
         
         # Save to database with error handling
         try:
-            print("Attempting to save to database...")
+            logger.info("Attempting to save to database...")
             result = db.child("analyses").child(user_id).child(name).set(save_data, token)
-            print(f"Database save result: {result}")
-            print("=== SAVE SUCCESSFUL ===")
+            logger.info(f"Database save result: {result}")
+            logger.info("=== SAVE SUCCESSFUL ===")
             return True
         except Exception as db_error:
-            print(f"Database error occurred: {db_error}")
-            # If it's an auth error, suggest re-login
+            logger.error(f"Database error occurred: {str(db_error)}")
             if "auth" in str(db_error).lower() or "unauthorized" in str(db_error).lower() or "permission" in str(db_error).lower():
                 raise Exception("Authentication expired - please log out and log back in")
             else:
@@ -102,30 +106,33 @@ def save_analysis(user, analysis, final_report=None):
         
     except Exception as e:
         error_msg = f"Error saving analysis: {str(e)}"
-        print(f"=== SAVE ERROR: {error_msg} ===")
+        logger.error(f"=== SAVE ERROR: {error_msg} ===")
         raise Exception(error_msg)
 
 def get_saved_analyses(user):
-    """Get all saved analyses for a user"""
+    """Get all saved analyses for a user."""
     try:
         # Get user ID with fallback
         user_id = user.get('localId')
         if not user_id:
-            # Fallback: use email as identifier (not ideal but functional)
             user_id = user.get('email', 'unknown_user')
+            logger.warning(f"No localId found, using email as fallback: {user_id}")
         
         # Get token for authenticated request
         token = user.get('idToken')
         if not token:
+            logger.warning("No authentication token found, returning empty list")
             return []
         
         analyses = db.child("analyses").child(user_id).get(token)
         
         if analyses.each():
+            logger.info(f"Retrieved {len(analyses.each())} saved analyses for user {user_id}")
             return [item.val() for item in analyses.each()]
         else:
+            logger.info("No saved analyses found")
             return []
             
     except Exception as e:
-        print(f"Error getting saved analyses: {str(e)}")
+        logger.error(f"Error getting saved analyses: {str(e)}")
         return []
