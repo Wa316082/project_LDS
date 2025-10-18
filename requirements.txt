@@ -37,7 +37,7 @@ bnlp_toolkit>=4.0.0
 langdetect>=1.0.9
 
 transformers>=4.44.0
-torch>=2.0.0+cu121
+torch>=2.4.0
 langdetect>=1.0.9
 scipy>=1.14.0
 
